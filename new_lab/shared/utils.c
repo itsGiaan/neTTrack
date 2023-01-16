@@ -1,20 +1,5 @@
 #include "utils.h"
 
-void load_from_file(FILE *fp, struct LinkedList* list)
-{
-    char ip_saver[INET_ADDRSTRLEN];
-    fp = fopen("hosts.dat", "r+");
-    if(fp != NULL)
-    {
-        while(fread(ip_saver, INET_ADDRSTRLEN, 1, fp) > 0)
-        {
-            list->insert(list, list->length, ip_saver, INET_ADDRSTRLEN);
-            memset(ip_saver, 0, INET_ADDRSTRLEN);
-        }
-    }
-    fclose(fp);
-}
-
 //HOSTED METHODS.
 
 //Somma di due interi.

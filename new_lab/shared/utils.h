@@ -49,7 +49,6 @@ struct PackedArguments
     struct Server *server;
 };
 
-void load_from_file(FILE *fp, struct LinkedList* list);
 
 //HOSTED METHODS PROTOTYPES.
 

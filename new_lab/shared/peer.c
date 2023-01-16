@@ -9,9 +9,6 @@
 short infected = 0;
 pthread_mutex_t infection_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-/*struct LinkedList *mine_global;
-pthread_mutex_t mine_list_mutex = PTHREAD_MUTEX_INITIALIZER;*/
-
 //Get a global copy so we can access the LinkedList without pass it as argument to the thread.
 struct LinkedList *their_global;
 pthread_mutex_t their_list_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -174,8 +171,6 @@ void * server_loop2(void *arg)
         found = check_id(id, loop_arg->known_hosts);
         if(found)
         {
-            //printf("\nGot a contact with %s\n", client_address);
-            //printf("\nBetter go home\n");
             matches++;
         }
     }

@@ -4,42 +4,6 @@
 #include "wrapper.h"
 #include "utils.h"
 
-short isKnowed(char* client_address, struct LinkedList *list);
-void * server_loop(void *arg);
-void * server_function(void *arg);
-void send_notify(char *client_address);
-
-int main()
-{
-    struct LinkedList known_hosts = linked_list_init();
-    pthread_t server_thread;
-    int infect;
-    char *client_address;
-    char ip_saver[INET_ADDRSTRLEN];
-    FILE *fp;
-    load_from_file(fp, &known_hosts);
-
-    printf("\nRandezvous server running...\n");
-    printf("\nCurrent peers: %d\n", known_hosts.length);
-    pthread_create(&server_thread, NULL, server_function, &known_hosts);
-
-    while(1)
-    {
-        if(known_hosts.length > 3)
-        {
-            infect = rand()%known_hosts.length;
-            client_address = (char*)known_hosts.retrieve(&known_hosts, infect);
-            send_notify(client_address);
-            sleep(5);
-        }
-    }
-
-    linked_list_destroy(&known_hosts);
-    exit(EXIT_SUCCESS);
-}
-
-
-
 pthread_mutex_t file_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 short isKnowed(char* client_address, struct LinkedList *list)
@@ -167,4 +131,43 @@ void send_notify(char *client_address)
         printf("\nHost unreachable\n");
     }
     close(client.socket);
+}
+
+int main()
+{
+    struct LinkedList known_hosts = linked_list_init();
+    pthread_t server_thread;
+    int infect;
+    char *client_address;
+    char ip_saver[INET_ADDRSTRLEN];
+    FILE *fp;
+    fp = fopen("hosts.dat", "r+");
+
+    if(fp != NULL)
+    {
+        while(fread(ip_saver, INET_ADDRSTRLEN, 1, fp) > 0)
+        {
+            known_hosts.insert(&known_hosts, known_hosts.length, ip_saver, INET_ADDRSTRLEN);
+            memset(ip_saver, 0, INET_ADDRSTRLEN);
+        }
+        fclose(fp);
+    }
+
+    printf("\nRandezvous server running...\n");
+    printf("\nCurrent peers: %d\n", known_hosts.length);
+    pthread_create(&server_thread, NULL, server_function, &known_hosts);
+
+    while(1)
+    {
+        if(known_hosts.length > 3)
+        {
+            infect = rand()%known_hosts.length;
+            client_address = (char*)known_hosts.retrieve(&known_hosts, infect);
+            send_notify(client_address);
+            sleep(5);
+        }
+    }
+
+    linked_list_destroy(&known_hosts);
+    exit(EXIT_SUCCESS);
 }
